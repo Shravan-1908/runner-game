@@ -1,3 +1,4 @@
+from pathlib import Path
 import pygame
 
 FRAMERATE = 60
@@ -10,6 +11,29 @@ pygame.display.set_caption("Chrome Dino but an alien (& snails) (& flies)")
 # simple surfaces
 # test_surface = pygame.Surface((100, 200))
 # test_surface.fill("red")
+
+
+def get_hi_score():
+    try:
+        file_path = Path.home() / ".alienssnailsflies.txt"
+        with open(str(file_path), encoding="utf-8") as f:
+            return int(f.read())
+    except FileNotFoundError or ValueError:
+        return 0
+    except Exception as e:
+        print("unknown error occured:", e)
+        exit(1)
+
+
+def set_hi_score(score):
+    try:
+        file_path = Path.home() / ".alienssnailsflies.txt"
+        with open(str(file_path), "w", encoding="utf-8") as f:
+            f.write(str(score))
+    except Exception as e:
+        print("unknown error occured:", e)
+        exit(1)
+
 
 # images
 sky_surf = pygame.image.load("./graphics/sky.png").convert()
@@ -26,11 +50,14 @@ player_rect = player_surf.get_rect(midbottom=(60, 300))
 player_gravity = 0
 
 score = 0
+hi_score = get_hi_score()
 last_increment_score = 50
 
 # fonts
 font = pygame.font.Font("./font/Pixeltype.ttf", 30)
 enter_text = font.render("press enter to start the game", False, "black")
+hi_score_text = font.render(f"hi score: {hi_score}", False, "red")
+hi_score_rect = hi_score_text.get_rect(topright=(WIDTH, 20))
 
 clock = pygame.time.Clock()
 running = True
@@ -53,13 +80,14 @@ while running:
                 if not game_active:
                     game_active = True
                     score = 0
-            if event.key == pygame.K_SPACE and player_rect.bottom >= 300:
+            elif event.key == pygame.K_SPACE and player_rect.bottom >= 300:
                 player_gravity = -18.5
 
     # screen.blit(test_surface, (0, 0))
     # backdrop
     screen.blit(sky_surf, (0, 0))
     screen.blit(ground_surf, (0, 300))
+    screen.blit(hi_score_text, hi_score_rect)
 
     # info
     score_text = font.render(f"score: {round(score)}", False, "red")
@@ -89,6 +117,11 @@ while running:
         snail_rect.x = 700
         snail_vel = -7
         game_active = False
+        if round(score) > hi_score:
+            set_hi_score(round(score))
+        hi_score = get_hi_score()
+        hi_score_text = font.render(f"hi score: {hi_score}", False, "red")
+        hi_score_rect = hi_score_text.get_rect(topright=(WIDTH, 20))
 
     # pygame.mouse.get_pressed()  # returns a tuple of bools stating if the mouse is left, scroll, or right clicked
     # pygame.mouse.get_pos()  # alternate way to get mouse position
