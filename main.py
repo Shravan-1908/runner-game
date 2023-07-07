@@ -5,7 +5,7 @@ WIDTH, HEIGHT = 800, 400
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Chrome Dino but a Person (& snails)")
+pygame.display.set_caption("Chrome Dino but an alien (& snails) (& flies)")
 
 # simple surfaces
 # test_surface = pygame.Surface((100, 200))
