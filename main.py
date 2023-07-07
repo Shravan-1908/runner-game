@@ -46,7 +46,7 @@ snail_vel = -7
 snail_rect = snail_surf.get_rect(topleft=(snail_x, snail_height))
 
 player_surf = pygame.image.load("./graphics/Player/player_walk_1.png").convert_alpha()
-player_rect = player_surf.get_rect(midbottom=(60, 300))
+player_rect = player_surf.get_rect(midbottom=(100, 300))
 player_gravity = 0
 
 score = 0
