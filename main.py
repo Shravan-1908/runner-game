@@ -6,7 +6,7 @@ WIDTH, HEIGHT = 800, 400
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Chrome Dino but an alien (& snails) (& flies)")
+pygame.display.set_caption("Pixel Runner")
 
 # simple surfaces
 # test_surface = pygame.Surface((100, 200))
@@ -15,7 +15,7 @@ pygame.display.set_caption("Chrome Dino but an alien (& snails) (& flies)")
 
 def get_hi_score():
     try:
-        file_path = Path.home() / ".alienssnailsflies.txt"
+        file_path = Path.home() / ".pixelrunner.txt"
         with open(str(file_path), encoding="utf-8") as f:
             return int(f.read())
     except FileNotFoundError or ValueError:
@@ -27,7 +27,7 @@ def get_hi_score():
 
 def set_hi_score(score):
     try:
-        file_path = Path.home() / ".alienssnailsflies.txt"
+        file_path = Path.home() / ".pixelrunner.txt"
         with open(str(file_path), "w", encoding="utf-8") as f:
             f.write(str(score))
     except Exception as e:
@@ -42,12 +42,18 @@ ground_surf = pygame.image.load("./graphics/ground.png").convert()
 snail_surf = pygame.image.load("./graphics/snail/snail1.png").convert_alpha()
 snail_x = 700
 snail_height = 265
-snail_vel = -7
+snail_vel = -8
 snail_rect = snail_surf.get_rect(topleft=(snail_x, snail_height))
 
 player_surf = pygame.image.load("./graphics/Player/player_walk_1.png").convert_alpha()
 player_rect = player_surf.get_rect(midbottom=(100, 300))
 player_gravity = 0
+
+player_stand_image = pygame.image.load("./graphics/Player/player_stand.png").convert_alpha()
+player_angle = 0
+player_scale = 3
+player_stand = pygame.transform.rotozoom(player_stand_image, player_angle, player_scale)
+player_stand_rect = player_stand.get_rect(center=(WIDTH / 2, 300))
 
 score = 0
 hi_score = get_hi_score()
@@ -59,6 +65,10 @@ enter_text = font.render("press enter to start the game", False, "black")
 hi_score_text = font.render(f"hi score: {hi_score}", False, "red")
 hi_score_rect = hi_score_text.get_rect(topright=(WIDTH, 20))
 
+# event timers
+obstacle_timer = pygame.USEREVENT + 1
+pygame.time.set_timer(obstacle_timer, 1500)
+
 clock = pygame.time.Clock()
 running = True
 game_active = False
@@ -67,7 +77,7 @@ while running:
     clock.tick(FRAMERATE)
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
             running = False
         # elif event.type == pygame.MOUSEMOTION  # if mouse is moved at all
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -82,6 +92,10 @@ while running:
                     score = 0
             elif event.key == pygame.K_SPACE and player_rect.bottom >= 300:
                 player_gravity = -18.5
+        
+        if game_active:
+            if event.type == obstacle_timer:
+                pass
 
     # screen.blit(test_surface, (0, 0))
     # backdrop
@@ -95,6 +109,11 @@ while running:
     screen.blit(score_text, score_rect)
     if not game_active:
         screen.blit(enter_text, (300, 50))
+        screen.blit(player_stand_image, player_stand_rect)
+        player_angle += 0.5
+        player_stand = pygame.transform.rotozoom(player_stand_image, player_angle, player_scale)
+        player_stand = pygame.transform.rotate(player_stand, player_angle)
+        player_stand_rect = player_stand.get_rect(center=(WIDTH / 2, 300))
         pygame.display.update()
         continue
 
